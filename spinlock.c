@@ -3,11 +3,21 @@
 #include <stdatomic.h>
 #include <pthread.h>
 #include <unistd.h>
+#include <string.h>
 
 #define ITERAZIONI     1000000
 #define DURATA_FAIRNESS 2   // secondi
 #define RITARDO_US      10  // <ritardo> tra due tentativi di LOCK
 #define LAVORO_SC       2000 // lunghezza sezione critica
+
+
+void crea_thread(pthread_t* t, void* (*fn)(void*), void* arg) {
+    int err = pthread_create(t, NULL, fn, arg);
+    if (err != 0) {
+        fprintf(stderr, "pthread_create: %s\n", strerror(err));
+        exit(EXIT_FAILURE);
+    }
+}
 
 // Risorsa condivisa
 long contatore = 0;
@@ -74,8 +84,8 @@ void esegui_contatore(const char* nome, void* (*worker)(void*)) {
     pthread_t p, q;
 
     contatore = 0;
-    pthread_create(&p, NULL, worker, NULL);
-    pthread_create(&q, NULL, worker, NULL);
+    crea_thread(&p, worker, NULL);
+    crea_thread(&q, worker, NULL);
     pthread_join(p, NULL);
     pthread_join(q, NULL);
 
@@ -102,8 +112,8 @@ void esegui_fairness(void) {
     pthread_t p, q;
     long ingressi_p = 0, ingressi_q = 0;
 
-    pthread_create(&p, NULL, worker_fairness, &ingressi_p);
-    pthread_create(&q, NULL, worker_fairness, &ingressi_q);
+    crea_thread(&p, worker_fairness, &ingressi_p);
+    crea_thread(&q, worker_fairness, &ingressi_q);
     sleep(DURATA_FAIRNESS);
     atomic_store(&fine, 1);
     pthread_join(p, NULL);

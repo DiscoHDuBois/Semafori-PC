@@ -3,6 +3,7 @@
 #include <stdatomic.h>
 #include <pthread.h>
 #include <unistd.h>
+#include <string.h>
 
 #define ITERAZIONI      100000
 #define DURATA_FAIRNESS 2     // secondi
@@ -10,6 +11,15 @@
 #define LAVORO_SC       2000  // lunghezza della sezione critica (demo fairness)
 #define MOLTEPLICITA    3     // molteplicità della risorsa (demo competitiva)
 #define NUM_FDE         8     // f.d.e. che competono M
+
+
+void crea_thread(pthread_t* t, void* (*fn)(void*), void* arg) {
+    int err = pthread_create(t, NULL, fn, arg);
+    if (err != 0) {
+        fprintf(stderr, "pthread_create: %s\n", strerror(err));
+        exit(EXIT_FAILURE);
+    }
+}
 
 
 /*
@@ -136,8 +146,8 @@ void esegui_pme(void) {
 
     INIZ_SEM(&SR, 1);
     contatore = 0;
-    pthread_create(&p, NULL, worker_pme, NULL);
-    pthread_create(&q, NULL, worker_pme, NULL);
+    crea_thread(&p, worker_pme, NULL);
+    crea_thread(&q, worker_pme, NULL);
     pthread_join(p, NULL);
     pthread_join(q, NULL);
 
@@ -168,8 +178,8 @@ void esegui_fairness(void) {
     long ingressi_p = 0, ingressi_q = 0;
 
     INIZ_SEM(&SR, 1);
-    pthread_create(&p, NULL, worker_fairness, &ingressi_p);
-    pthread_create(&q, NULL, worker_fairness, &ingressi_q);
+    crea_thread(&p, worker_fairness, &ingressi_p);
+    crea_thread(&q, worker_fairness, &ingressi_q);
     sleep(DURATA_FAIRNESS);
     atomic_store(&fine, 1);
     pthread_join(p, NULL);
@@ -200,7 +210,7 @@ void esegui_join(void) {
     pthread_t pi;
 
     INIZ_SEM(&Sij, 0);
-    pthread_create(&pi, NULL, fde_Pi, NULL);  // fork Pi
+    crea_thread(&pi, fde_Pi, NULL);  // fork Pi
     printf("[Pj] eseguo P(Sij) al posto della join Pi\n");
     P(&Sij);
     printf("[Pj] Pi ha terminato, proseguo\n");
@@ -236,7 +246,7 @@ void esegui_competitivo(void) {
 
     INIZ_SEM(&SM, MOLTEPLICITA);
     for (long i = 0; i < NUM_FDE; i++)
-        pthread_create(&t[i], NULL, worker_competitivo, (void*)i);
+        crea_thread(&t[i], worker_competitivo, (void*)i);
     for (int i = 0; i < NUM_FDE; i++)
         pthread_join(t[i], NULL);
 

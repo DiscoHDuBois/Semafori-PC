@@ -4,17 +4,33 @@
 #include <semaphore.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <errno.h>
+#include <string.h>
 
 // Nome del semaforo POSIX (su macOS sem_init non è implementata, quindi si usano i semafori con nome: sem_open/sem_close/sem_unlink)
 #define SEM_NAME "/semaforo_binario"
 
 sem_t *mutex;
 
+
+void crea_thread(pthread_t* t, void* (*fn)(void*), void* arg) {
+    int err = pthread_create(t, NULL, fn, arg);
+    if (err != 0) {
+        fprintf(stderr, "pthread_create: %s\n", strerror(err));
+        exit(EXIT_FAILURE);
+    }
+}
+
 void* worker(void* arg) {
     long id = (long)arg;
 
-    // wait / decremento
-    sem_wait(mutex);
+    // wait / decremento (se interrotta da un segnale, EINTR, si riprova)
+    while (sem_wait(mutex) == -1) {
+        if (errno != EINTR) {
+            perror("sem_wait");
+            exit(EXIT_FAILURE);
+        }
+    }
 
     // Sezione Critica
     printf("[Thread %ld] Entrato nella sezione critica.\n", id);
@@ -22,7 +38,10 @@ void* worker(void* arg) {
     printf("[Thread %ld] In uscita dalla sezione critica.\n", id);
 
     // post / incremento
-    sem_post(mutex);
+    if (sem_post(mutex) == -1) {
+        perror("sem_post");
+        exit(EXIT_FAILURE);
+    }
 
     return NULL;
 }
@@ -40,8 +59,8 @@ int main(void) {
         return EXIT_FAILURE;
     }
 
-    pthread_create(&t1, NULL, worker, (void*)1);
-    pthread_create(&t2, NULL, worker, (void*)2);
+    crea_thread(&t1, worker, (void*)1);
+    crea_thread(&t2, worker, (void*)2);
 
     pthread_join(t1, NULL);
     pthread_join(t2, NULL);
