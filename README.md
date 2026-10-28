@@ -12,7 +12,7 @@
   delle slide (S, coda FIFO Qs, spin lock SX), con quattro demo: mutua
   esclusione, fairness, join in stile cooperativo e risorsa di molteplicità M
   in stile competitivo.
-- `DIJKSTRA.md`: guida dallo pseudocodice al codice C.
+- `DIJKSTRA.md`: guida dallo pseudocodice al C.
 
 ## Compilazione
 
