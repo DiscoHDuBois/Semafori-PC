@@ -163,7 +163,7 @@ In `dijkstra.c` l'indivisibilità poggia quindi solo su `SX`.
 
 ## 7. Confronto con i semafori POSIX
 
-Le stesse primitive esistono già pronte in `<semaphore.h>` (`binario_posix.c`):
+Le stesse primitive esistono già pronte in `<semaphore.h>` (`bin_posix.c`):
 
 | Dijkstra      | POSIX                                 | man |
 |---------------|---------------------------------------|-----|
