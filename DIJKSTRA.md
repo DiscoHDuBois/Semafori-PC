@@ -1,4 +1,4 @@
-# Dallo pseudocodice al C: semafori di Dijkstra
+# Dallo pseudocodice a C: semafori di Dijkstra
 
 Miniguida al passaggio dallo pseudocodice
 al codice di `dijkstra.c`.
