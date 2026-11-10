@@ -99,7 +99,7 @@ static int in_relazione(const modello* a, const modello* b) {
     return a->n == b->n && memcmp(a->Q, b->Q, a->n * sizeof(int)) == 0;   // stessa coda
 }
 
-// Esegue p sui 2
+// Esegue p su A e su B: 1 se l'esito è lo stesso e gli stati restano in relazione
 static int stesso_passo(modello* a, modello* b, passo p, int* esito) {
     *esito = applica_A(a, p);
     return applica_B(b, p) == *esito && in_relazione(a, b);
