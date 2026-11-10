@@ -106,9 +106,10 @@ static int stesso_passo(modello* a, modello* b, passo p, int* esito) {
 }
 
 /*
-Passo Induttivo: PER OGNI coppia di stati in relazione (raggiungibile o meno entro
-PROFONDITA) ogni primitiva di ogni flusso non sospeso dà lo stesso esito e
-porta a una coppia ancora in relazione.
+Passo Induttivo: PER OGNI coppia di stati in relazione con S_A = 0..S_PASSO_MAX
+e NUM_FLUSSI flussi (raggiungibile o meno entro PROFONDITA) ogni primitiva di
+ogni flusso non sospeso dà lo stesso esito e porta a una coppia ancora in
+relazione.
 Per (I_A) gli stati di A sono: S_A > 0 con la coda vuota, oppure S_A = 0 con
 una coda qualunque. Lo stato di B è fissato da (R).
 */
