@@ -2,3 +2,7 @@
 .vscode/
 .idea/
 .tests
+/spinlock
+/bin_posix
+/dijkstra
+/equivalenza
