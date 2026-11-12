@@ -1,8 +1,4 @@
-# Implementazione in C Semaforo Binario POSIX
-
-<p align="center">
-    Prima implementazione dei semafori binari in C e spin lock.
-</p>
+# Semafori in C
 
 ## File
 
