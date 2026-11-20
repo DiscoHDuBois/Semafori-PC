@@ -1,4 +1,4 @@
-# Semafori in C
+# Implementazione Semafori in C
 
 ## File
 
